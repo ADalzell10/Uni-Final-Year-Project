@@ -22,13 +22,45 @@
  */
 package hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor;
 
-import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
-import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Checkpoint {
 	
+	static CheckpointSingleJobRunner s = new CheckpointSingleJobRunner();
+	
+	
+	public static void main (String[] args) {
+	
+		s.beginJob();
+		
+		//checkpoint begins
+		System.out.println("Saving Checkpoint");
+		
+		
+	}
+
+
+	public static void saveCheckpoint() {
+		
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() { 
+		   public void run() {
+			   System.out.println();
+			   System.out.println("\nCheckpoint Saved"); 
+			   jobReturn(); //call back to job runner to resume job
+		   }
+		},  3000);
+		
+			
+	}
+	
+	private static void jobReturn() {
+		
+		System.out.println("\nResuming job execution");
+		
+		// call to job runner class
+		
+		
+	}
 }

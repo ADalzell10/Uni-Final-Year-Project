@@ -32,6 +32,8 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption
 public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
+	
+	Checkpoint check = new Checkpoint();
 
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
@@ -54,6 +56,7 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		}
 	};
 
+	
 	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs, MultiIaaSJobDispatcher forMe) {
 		toProcess = runMe;
 		keeperSet = onUs;
@@ -73,6 +76,12 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		// will show the job ignored)
 		parent.ignorecounter++;
 		startProcess();
+	}
+	
+	// added by me
+
+	public CheckpointSingleJobRunner() {
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -162,4 +171,15 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		// just ignore this has happened :)
 		// In the current setup we are not supposed to have failing jobs
 	}
+	
+	
+	//added by my to test class calls
+	public void beginJob() {
+		System.out.println("begins");
+		check.saveCheckpoint();
+		
+		
+	}
+	
+	
 }
