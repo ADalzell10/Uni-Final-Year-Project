@@ -20,7 +20,7 @@
  *  
  *  (C) Copyright 2015, Gabor Kecskemeti (kecskemeti.gabor@sztaki.mta.hu)
  */
-package hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor;
+package checkpoint.project;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +28,7 @@ import java.util.TimerTask;
 public class Checkpoint {
 	
 	static CheckpointSingleJobRunner s = new CheckpointSingleJobRunner();
+	
 	
 	
 	public static void main (String[] args) {

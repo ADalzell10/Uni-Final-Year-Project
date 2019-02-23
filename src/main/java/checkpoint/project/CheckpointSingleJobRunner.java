@@ -20,7 +20,7 @@
  *  
  *  (C) Copyright 2015, Gabor Kecskemeti (kecskemeti.gabor@sztaki.mta.hu)
  */
-package hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor;
+package checkpoint.project;
 
 import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
@@ -43,7 +43,7 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
 	private VirtualMachine[] vmSet;
-	private MultiIaaSJobDispatcher parent;
+	//private MultiIaaSJobDispatcher parent;
 	private int readyVMCounter = 0;
 	private int completionCounter = 0;
 	private DeferredEvent timeout = new DeferredEvent(startupTimeout) {
@@ -57,10 +57,10 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	};
 
 	
-	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs, MultiIaaSJobDispatcher forMe) {
+	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
-		parent = forMe;
+		//parent = forMe;
 		vmSet = new VirtualMachine[keeperSet.length];
 		// Ensuring we receive state dependent events about the new VMs
 		for (int i = 0; i < keeperSet.length; i++) {
@@ -74,7 +74,7 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		// Increasing ignorecounter in order to sign that the job in this runner
 		// is not yet finished (so the premature termination of the simulation
 		// will show the job ignored)
-		parent.ignorecounter++;
+		//parent.ignorecounter++;
 		startProcess();
 	}
 	
@@ -88,23 +88,23 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	public void stateChanged(final VirtualMachine vm, final VirtualMachine.State oldState,
 			final VirtualMachine.State newState) {
 		// If the dispatching process was cancelled
-		if (parent.isStopped()) {
-			switch (newState) {
-			case NONSERVABLE:
-			case DESTROYED:
-			case INITIAL_TR:
-				// OK
-				break;
-			default:
-				try {
-					vm.unsubscribeStateChange(this);
-					vm.destroy(true);
-				} catch (VMManager.VMManagementException ex) {
-					// Ignore as we want to get rid of the VM
-				}
-			}
-			return;
-		}
+//		if (parent.isStopped()) {
+//			switch (newState) {
+//			case NONSERVABLE:
+//			case DESTROYED:
+//			case INITIAL_TR:
+//				// OK
+//				break;
+//			default:
+//				try {
+//					vm.unsubscribeStateChange(this);
+//					vm.destroy(true);
+//				} catch (VMManager.VMManagementException ex) {
+//					// Ignore as we want to get rid of the VM
+//				}
+//			}
+//			return;
+//		}
 
 		// Now to the real business of having a VM that is actually capable of
 		// running the job
@@ -149,9 +149,9 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 			toProcess.completed();
 			// the VMs are no longer needed
 			releaseVMset();
-			parent.increaseDestroyCounter(completionCounter);
-			parent.ignorecounter--;
-			parent = null;
+//			parent.increaseDestroyCounter(completionCounter);
+//			parent.ignorecounter--;
+//			parent = null;
 			vmSet = null;
 			toProcess = null;
 		}
