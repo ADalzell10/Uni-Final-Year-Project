@@ -23,6 +23,7 @@
 package checkpoint.project;
 
 import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
+import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
@@ -33,13 +34,15 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
-	Checkpoint check = new Checkpoint();
+	
 
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
 		startupTimeout = to == null ? defaultStartupTimeout : Long.parseLong(to);
 		System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
+	private Checkpoint checkpoint;
+	
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
 	private VirtualMachine[] vmSet;
@@ -57,7 +60,8 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	};
 
 	
-	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
+	public void CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
+		System.out.println("hello");
 		toProcess = runMe;
 		keeperSet = onUs;
 		//parent = forMe;
@@ -78,12 +82,8 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		startProcess();
 	}
 	
-	// added by me
-
-	public CheckpointSingleJobRunner() {
-		// TODO Auto-generated constructor stub
-	}
-
+	
+	
 	@Override
 	public void stateChanged(final VirtualMachine vm, final VirtualMachine.State oldState,
 			final VirtualMachine.State newState) {
@@ -174,12 +174,10 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	
 	
 	//added by my to test class calls
-	public void beginJob() {
-		System.out.println("begins");
-		check.saveCheckpoint();
-		
-		
-	}
+//	public void beginJob() {
+//		System.out.println("begins");
+//		checkpoint.saveCheckpoint();
+		//}
 	
 	
 }

@@ -25,6 +25,7 @@ package checkpoint.project;
 import java.lang.reflect.InvocationTargetException;
 
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
+import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
@@ -34,33 +35,39 @@ import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.unimiskolc.iit.distsys.ExercisesBase;
 
-public class Start {
+public class SetupIaas {
 	
-	
+	private CheckpointSingleJobRunner SJR;
 	private ExercisesBaseProj base;
+	private VMKeeper keeper;
+	private Job job;
 	
 	
 	
-	
-	public Start() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
+	public SetupIaas() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		VirtualAppliance va = null;
-		ResourceConstraints rc = null;
-		Repository vaSource = null;
-		int count = 0;
 		
 		@SuppressWarnings("static-access")
-		IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(3).listVMs();
-		VirtualMachine requesting = ExercisesBaseProj.getComplexInfrastructure(3).requestVM(va, rc, vaSource, count);
+		IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
+		
+		VirtualAppliance machine = (VirtualAppliance) gettingIaas.machines;
+		ResourceConstraints capacity = gettingIaas.getCapacities();
+		Repository repo = (Repository) gettingIaas.repositories;
+		
+		VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 3);
 		
 		
 		IaaSService selectIaas = gettingIaas; //looking at list of vms
-		VirtualMachine request = requesting; //choosing vm
-		Object capacity = ExercisesBaseProj.getComplexInfrastructure(3).getCapacities(); // provides resource constraint
+		VirtualMachine[] request = requesting; //choosing vm
+		
+		
+		// VMKEEPER TAKES VIRTUALMACHINE BUT THE REQUEST USE VIRTUALMACHINE[]
 		
 		VMKeeper keeper = new VMKeeper(selectIaas, request, 0);
 		
 		
+		
+//		SJR.CheckpointSingleJobRunner(job, keeper);
 		
 		
 		
