@@ -22,6 +22,7 @@
  */
 package checkpoint.project;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
@@ -39,15 +40,13 @@ public class SetupIaas {
 	
 	private CheckpointSingleJobRunner SJR;
 	private ExercisesBaseProj base;
-	private VMKeeper keeper;
-	private Job job;
+	private VMKeeper[] keeper;
+	private static Job job;
 	
 	
 	
 	public SetupIaas() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		
-		@SuppressWarnings("static-access")
 		IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 		
 		VirtualAppliance machine = (VirtualAppliance) gettingIaas.machines;
@@ -56,34 +55,33 @@ public class SetupIaas {
 		
 		VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 3);
 		
+		VirtualMachine thisMachine = (VirtualMachine) Array.get(requesting, 0);
 		
 		IaaSService selectIaas = gettingIaas; //looking at list of vms
-		VirtualMachine[] request = requesting; //choosing vm
+		VirtualMachine request = thisMachine; //choosing vm
+		long bill = 2;
 		
-		
-		// VMKEEPER TAKES VIRTUALMACHINE BUT THE REQUEST USE VIRTUALMACHINE[]
-		
-		VMKeeper keeper = new VMKeeper(selectIaas, request, 0);
-		
-		
-		
-//		SJR.CheckpointSingleJobRunner(job, keeper);
-		
+	
+		VMKeeper[] aaronKeeper = getKeeper(selectIaas, request, bill);
+		Job thisJob = getJob(job);
+	
+		//CheckpointSingleJobRunner s = new CheckpointSingleJobRunner(getJob(job), getKeeper(selectIaas, request, bill));
 		
 		
 	}
-
-
+	
+	public static Job getJob(Job job) {
+		return getJob(job);
+	}
+	
+	public static VMKeeper[] getKeeper(IaaSService selectIaas, VirtualMachine request, long bill) {
+		return getKeeper(selectIaas, request, bill);
+	}
+	
+	
+//	private void getKeeper (IaaSService selectIaas, VirtualMachine request, long bill) {
+//		return;
+//	}
 	
 
-
-	
-	
-	
-
-
-
-	
-
-	
 }

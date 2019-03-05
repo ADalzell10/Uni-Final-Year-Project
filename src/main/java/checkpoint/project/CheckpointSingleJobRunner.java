@@ -34,7 +34,6 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
-	
 
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
@@ -42,6 +41,7 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
 	private Checkpoint checkpoint;
+	private SetupIaas setup;
 	
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
@@ -58,10 +58,9 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 			releaseVMset();
 		}
 	};
-
 	
-	public void CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
-		System.out.println("hello");
+	
+	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
 		//parent = forMe;
@@ -178,6 +177,8 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 //		System.out.println("begins");
 //		checkpoint.saveCheckpoint();
 		//}
+	
+	
 	
 	
 }
