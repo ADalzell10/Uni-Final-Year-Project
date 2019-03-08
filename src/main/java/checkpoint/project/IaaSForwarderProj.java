@@ -36,6 +36,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.notifications.SingleNotificationHandler;
 import hu.mta.sztaki.lpds.cloud.simulator.notifications.StateDependentEventHandler;
+import hu.unimiskolc.iit.distsys.forwarders.ForwardingRecorder;
 
 public class IaaSForwarderProj extends IaaSService implements ForwardingRecorder {
 	public interface VMListener {

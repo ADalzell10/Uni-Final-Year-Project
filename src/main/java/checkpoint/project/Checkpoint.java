@@ -22,46 +22,44 @@
  */
 package checkpoint.project;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Checkpoint {
 	
-	static CheckpointSingleJobRunner s = new CheckpointSingleJobRunner();
-	
-	
+	static CPSingleJobRunner s = new CPSingleJobRunner();
 	
 	public static void main (String[] args) {
 	
-		s.beginJob();
 		
-		//checkpoint begins
-		System.out.println("Saving Checkpoint");
-		
-		
+		s.takeCheckpoint();
+		//checkpoint begins saving
+		System.out.println("Saving Checkpoint.");
 	}
-
 
 	public static void saveCheckpoint() {
 		
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() { 
-		   public void run() {
-			   System.out.println();
-			   System.out.println("\nCheckpoint Saved"); 
-			   jobReturn(); //call back to job runner to resume job
-		   }
-		},  3000);
+		System.out.println();
+		System.out.println("\nCheckpoint Saved."); 
 		
-			
+		
+		
+		
+		jobReturn(); //call back to job runner to resume job
+		  	
 	}
 	
 	private static void jobReturn() {
 		
-		System.out.println("\nResuming job execution");
+		System.out.println("\nResuming job execution.");
 		
 		// call to job runner class
 		
 		
+	}
+	
+	public static void loadCheckpoint() {
+		//loads most recent checkpoint
+		System.out.println("\nLoading checkpoint.");
+		
+		//call to where checkpoints are saved for reload of job progress
 	}
 }

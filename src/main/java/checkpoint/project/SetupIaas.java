@@ -38,7 +38,7 @@ import hu.unimiskolc.iit.distsys.ExercisesBase;
 
 public class SetupIaas {
 	
-	private CheckpointSingleJobRunner SJR;
+	private CPSingleJobRunner SJR;
 	private ExercisesBaseProj base;
 	private VMKeeper[] keeper;
 	private static Job job;

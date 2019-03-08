@@ -30,7 +30,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
 
-public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, ConsumptionEvent {
+public class CPSingleJobRunner implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
@@ -46,7 +46,6 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
 	private VirtualMachine[] vmSet;
-	//private MultiIaaSJobDispatcher parent;
 	private int readyVMCounter = 0;
 	private int completionCounter = 0;
 	private DeferredEvent timeout = new DeferredEvent(startupTimeout) {
@@ -60,10 +59,10 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	};
 	
 	
-	public CheckpointSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
+	public CPSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
-		//parent = forMe;
+		
 		vmSet = new VirtualMachine[keeperSet.length];
 		// Ensuring we receive state dependent events about the new VMs
 		for (int i = 0; i < keeperSet.length; i++) {
@@ -83,6 +82,12 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	
 	
 	
+	public CPSingleJobRunner() {
+		
+	}
+
+
+
 	@Override
 	public void stateChanged(final VirtualMachine vm, final VirtualMachine.State oldState,
 			final VirtualMachine.State newState) {
@@ -108,7 +113,7 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 		// Now to the real business of having a VM that is actually capable of
 		// running the job
 		if (newState.equals(VirtualMachine.State.RUNNING)) {
-			// Ensures that jobs inteded for parallel execution are really run
+			// Ensures that jobs intended for parallel execution are really run
 			// in parallel
 			++readyVMCounter;
 			startProcess();
@@ -172,11 +177,11 @@ public class CheckpointSingleJobRunner implements VirtualMachine.StateChange, Co
 	}
 	
 	
-	//added by my to test class calls
-//	public void beginJob() {
-//		System.out.println("begins");
-//		checkpoint.saveCheckpoint();
-		//}
+//	added by my to test class calls
+	public void takeCheckpoint() {
+		System.out.println("begins");
+		
+		}
 	
 	
 	
