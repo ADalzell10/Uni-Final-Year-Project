@@ -23,7 +23,7 @@
 package checkpoint.project;
 
 
-public class Checkpoint {
+public class Checkpoint2 {
 	
 	//static CPSingleJobRunner s = new CPSingleJobRunner();
 	

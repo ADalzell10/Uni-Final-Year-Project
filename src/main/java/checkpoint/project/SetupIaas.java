@@ -39,7 +39,7 @@ import hu.unimiskolc.iit.distsys.ExercisesBase;
 public class SetupIaas {
 	
 	private CPSingleJobRunner SJR;
-	private ExercisesBaseProj base;
+	private ExercisesBase base;
 	private VMKeeper[] keeper;
 	private static Job job;
 	
@@ -47,7 +47,7 @@ public class SetupIaas {
 	
 	public SetupIaas() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
+		IaaSService gettingIaas = (IaaSService) ExercisesBase.getComplexInfrastructure(1);
 		
 		VirtualAppliance machine = (VirtualAppliance) gettingIaas.machines;
 		ResourceConstraints capacity = gettingIaas.getCapacities();

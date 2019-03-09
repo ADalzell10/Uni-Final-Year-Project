@@ -40,7 +40,9 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		startupTimeout = to == null ? defaultStartupTimeout : Long.parseLong(to);
 		System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
-	private Checkpoint checkpoint;
+	
+	Checkpoint checkpoint = new Checkpoint();
+	
 	private SetupIaas setup;
 	
 	private Job toProcess;
@@ -178,10 +180,17 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	
 //	added by my to test class calls
+	
 	public void takeCheckpoint() {
-		System.out.println("begins");
+		System.out.println("begins this");
+		
+		checkpoint.saveCheckpoint();
 		
 		}
+	
+	public void pleaseWork() {
+		checkpoint.jobReturn();
+	}
 	
 	
 	
