@@ -38,7 +38,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
 		startupTimeout = to == null ? defaultStartupTimeout : Long.parseLong(to);
-		System.err.println("VM startup timeout is set to " + startupTimeout);
+		//System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
 	
 	Checkpoint checkpoint = new Checkpoint();
@@ -181,16 +181,16 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 //	added by my to test class calls
 	
-	public void takeCheckpoint() {
+	public void beginJob() {
 		System.out.println("begins this");
 		
 		checkpoint.saveCheckpoint();
 		
 		}
 	
-	public void pleaseWork() {
-		checkpoint.jobReturn();
-	}
+//	public void pleaseWork() {
+//		checkpoint.jobReturn();
+//	}
 	
 	
 	
