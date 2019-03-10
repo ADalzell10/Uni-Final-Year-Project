@@ -24,37 +24,44 @@ package checkpoint.project;
 
 
 public class Checkpoint {
-	
 
 	static CPSingleJobRunner s = new CPSingleJobRunner();
 
-
 	public static void main (String[] args) {
 
-		s.beginJob();
-
-		//checkpoint begins
-		System.out.println("Saving Checkpoint");
-
-
+		
+		
+		//s.takeCheckpoint();
+		//checkpoint begins saving
+		s.loadCheckpoint();
 	}
-
 
 	public static void saveCheckpoint() {
 
-		System.out.println();
-		System.out.println("\nCheckpoint Saved");
-		   
-		jobReturn();
+		System.out.println("Saving Checkpoint.");
+		System.out.println("\nCheckpoint Saved."); 
+
+
+
+
+		jobReturn(); //call back to job runner to resume job
 
 	}
 
 	private static void jobReturn() {
 
-		System.out.println("\nResuming job execution");
+		System.out.println("\nResuming job execution.");
 
 		// call to job runner class
 
 
+	}
+
+	public static void loadCheckpoint() {
+		//loads most recent checkpoint
+		System.out.println("\nLoading checkpoint.");
+		System.out.println("\nCheckpoint loaded.");
+
+		//call to where checkpoints are saved for reload of job progress
 	}
 }

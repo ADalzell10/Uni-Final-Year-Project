@@ -24,48 +24,88 @@ package checkpoint.project;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
+import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.State;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
+import hu.mta.sztaki.lpds.cloud.simulator.io.StorageObject;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
-import hu.unimiskolc.iit.distsys.ExercisesBase;
+import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
+import checkpoint.project.ExercisesBaseProj;
 
 public class SetupIaas {
 	
 	private CPSingleJobRunner SJR;
-	private ExercisesBase base;
-	private VMKeeper[] keeper;
+	private ExercisesBaseProj base;
+	private static VMKeeper[] keeper;
 	private static Job job;
 	
+public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
+
+	//getting infrastructure
+	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
+	//List<Repository> repo = gettingIaas.repositories;
 	
 	
-	public SetupIaas() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
-		
-		IaaSService gettingIaas = (IaaSService) ExercisesBase.getComplexInfrastructure(1);
-		
-		VirtualAppliance machine = (VirtualAppliance) gettingIaas.machines;
-		ResourceConstraints capacity = gettingIaas.getCapacities();
-		Repository repo = (Repository) gettingIaas.repositories;
-		
-		VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 3);
-		
-		VirtualMachine thisMachine = (VirtualMachine) Array.get(requesting, 0);
-		
-		IaaSService selectIaas = gettingIaas; //looking at list of vms
-		VirtualMachine request = thisMachine; //choosing vm
-		long bill = 2;
-		
+	System.out.println(gettingIaas);
 	
-		VMKeeper[] aaronKeeper = getKeeper(selectIaas, request, bill);
-		Job thisJob = getJob(job);
 	
-		//CheckpointSingleJobRunner s = new CheckpointSingleJobRunner(getJob(job), getKeeper(selectIaas, request, bill));
+	//getting arguments to request a VM
+	VirtualAppliance machine = new VirtualAppliance("AD1", 1.5, 10);
+	ResourceConstraints capacity = gettingIaas.getCapacities();
+	
+	
+	
+	//setting up repository
+	Map<String, Integer> latency = new HashMap<String, Integer>(16);
+	
+	String state = null;
+	
+	Map<String, PowerState> diskPower = new HashMap<String, PowerState>();
+	Map<String, PowerState> networkPower = new HashMap<String, PowerState>();
+	
+	PowerState thisDiskPower = PowerTransitionGenerator.getPowerStateFromMap(diskPower, state);
+	PowerState thisNetworkPower = PowerTransitionGenerator.getPowerStateFromMap(networkPower, state);
+	
+	
+	Map<String, PowerState> diskPower2 = (Map<String, PowerState>) thisDiskPower;
+	Map<String, PowerState> networkPower2 = (Map<String, PowerState>) thisNetworkPower;
+	
+	
+	
+	Repository repo = new Repository(100, "AD2", 20, 20, 25, latency, diskPower2, networkPower2);
+	
+	VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 3);
+	
+	VirtualMachine thisMachine = (VirtualMachine) Array.get(requesting, 0);
+	
+	IaaSService selectIaas = gettingIaas; //looking at list of vms
+	VirtualMachine request = thisMachine; //choosing vm
+	long bill = 2;
+	
+	getKeeper(selectIaas, request, bill);
+	//VMKeeper[] aaronKeeper = getKeeper(selectIaas, request, bill);
+	//Job thisJob = getJob(job);
+
+	//CheckpointSingleJobRunner s = new CheckpointSingleJobRunner(getJob(job), getKeeper(selectIaas, request, bill));
+	}
+
+	
+	
+	public SetupIaas()  {
 		
 		
 	}
@@ -75,7 +115,12 @@ public class SetupIaas {
 	}
 	
 	public static VMKeeper[] getKeeper(IaaSService selectIaas, VirtualMachine request, long bill) {
-		return getKeeper(selectIaas, request, bill);
+		System.out.println(selectIaas);
+		System.out.println(request);
+		System.out.println(bill);
+		return keeper; 
+		//getKeeper(selectIaas, request, bill);
+		
 	}
 	
 	

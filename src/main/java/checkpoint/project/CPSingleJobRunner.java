@@ -60,6 +60,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		}
 	};
 	
+	//CPSingleJobRunner herehere = new CPSingleJobRunner();
 	
 	public CPSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
@@ -181,16 +182,16 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 //	added by my to test class calls
 	
-	public void beginJob() {
-		System.out.println("begins this");
+	public void takeCheckpoint() {
+		System.out.println("begin");
 		
 		checkpoint.saveCheckpoint();
 		
 		}
 	
-//	public void pleaseWork() {
-//		checkpoint.jobReturn();
-//	}
+	public void loadCheckpoint() {
+		checkpoint.loadCheckpoint();
+	}
 	
 	
 	
