@@ -26,6 +26,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,53 +55,52 @@ public class SetupIaas {
 	private static Job job;
 	
 public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
-
+	
+	
+	
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
-	//List<Repository> repo = gettingIaas.repositories;
-	
-	
-	System.out.println(gettingIaas);
 	
 	
 	//getting arguments to request a VM
 	VirtualAppliance machine = new VirtualAppliance("AD1", 1.5, 10);
 	ResourceConstraints capacity = gettingIaas.getCapacities();
 	
-	
-	
 	//setting up repository
 	Map<String, Integer> latency = new HashMap<String, Integer>(16);
 	
-	String state = null;
+	final EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> state = PowerTransitionGenerator.generateTransitions(20, 296, 493, 50, 108);
 	
-	Map<String, PowerState> diskPower = new HashMap<String, PowerState>();
-	Map<String, PowerState> networkPower = new HashMap<String, PowerState>();
+	final Map<String, PowerState> diskPower = state.get(PowerTransitionGenerator.PowerStateKind.storage);
+	final Map<String, PowerState> networkPower = state.get(PowerTransitionGenerator.PowerStateKind.network);
 	
-	PowerState thisDiskPower = PowerTransitionGenerator.getPowerStateFromMap(diskPower, state);
-	PowerState thisNetworkPower = PowerTransitionGenerator.getPowerStateFromMap(networkPower, state);
+	Repository repo = new Repository(1000000, "AD2", 2000, 2000, 3500, latency, diskPower, networkPower);
 	
+	//vm request
+	VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 1);
 	
-	Map<String, PowerState> diskPower2 = (Map<String, PowerState>) thisDiskPower;
-	Map<String, PowerState> networkPower2 = (Map<String, PowerState>) thisNetworkPower;
+	//System.out.println(requesting);
 	
-	
-	
-	Repository repo = new Repository(100, "AD2", 20, 20, 25, latency, diskPower2, networkPower2);
-	
-	VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 3);
-	
+	//setting up vmkeeper
 	VirtualMachine thisMachine = (VirtualMachine) Array.get(requesting, 0);
 	
-	IaaSService selectIaas = gettingIaas; //looking at list of vms
-	VirtualMachine request = thisMachine; //choosing vm
-	long bill = 2;
+	IaaSService selectIaas = gettingIaas; 	//iaas
+	VirtualMachine request = thisMachine; 	//choosing vm
+	long bill = 2;							//bill
 	
-	getKeeper(selectIaas, request, bill);
+	//getKeeper(selectIaas, request, bill);
+	
 	//VMKeeper[] aaronKeeper = getKeeper(selectIaas, request, bill);
-	//Job thisJob = getJob(job);
+	VMKeeper ke = new VMKeeper(selectIaas, request, bill);
+	
+	//VMKeeper[] thisKeeper = ke;
+	
+	Job thisJob = new Job("1001", 10, 5, 20, 4, 5, 10, "Aaron","client", "exec", null, 4);
+	
+	Job thisJob = null;
+	
 
-	//CheckpointSingleJobRunner s = new CheckpointSingleJobRunner(getJob(job), getKeeper(selectIaas, request, bill));
+	CPSingleJobRunner s = new CPSingleJobRunner(getJob(thisJob), getKeeper(selectIaas, request, bill));
 	}
 
 	
@@ -111,15 +111,11 @@ public static void main (String[] args) throws IllegalArgumentException, Securit
 	}
 	
 	public static Job getJob(Job job) {
-		return getJob(job);
+		return job;
 	}
 	
 	public static VMKeeper[] getKeeper(IaaSService selectIaas, VirtualMachine request, long bill) {
-		System.out.println(selectIaas);
-		System.out.println(request);
-		System.out.println(bill);
 		return keeper; 
-		//getKeeper(selectIaas, request, bill);
 		
 	}
 	
@@ -127,6 +123,17 @@ public static void main (String[] args) throws IllegalArgumentException, Securit
 //	private void getKeeper (IaaSService selectIaas, VirtualMachine request, long bill) {
 //		return;
 //	}
+	
+	public void setupJob (String choice) {
+		if (choice.equals("yes")) {
+			System.out.println("Job submitted");
+			
+			//new CPSingleJobRunner(job, keeper);
+			
+			CPSingleJobRunner ss = new CPSingleJobRunner();
+			ss.beginJob();
+		}
+	}
 	
 
 }

@@ -22,6 +22,8 @@
  */
 package checkpoint.project;
 
+import java.util.Scanner;
+
 import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
@@ -34,6 +36,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
+	private final static Scanner S = new Scanner(System.in);
 
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
@@ -41,7 +44,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		//System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
 	
-	Checkpoint checkpoint = new Checkpoint();
+	Checkpoint checkpoint;
 	
 	private SetupIaas setup;
 	
@@ -61,6 +64,17 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	};
 	
 	//CPSingleJobRunner herehere = new CPSingleJobRunner();
+	
+	public static void main (String[] args) {
+		String choice = "";
+		SetupIaas ss = new SetupIaas();
+		
+		System.out.println("Do you wish to submit a job?");
+		choice = S.nextLine();
+		ss.setupJob(choice);
+		
+		
+	}
 	
 	public CPSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
@@ -180,10 +194,19 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	}
 	
 	
+	
+	
 //	added by my to test class calls
 	
+	public void beginJob() {
+		System.out.println("Job Executing.");
+		
+		takeCheckpoint();
+		
+		}
+	
 	public void takeCheckpoint() {
-		System.out.println("begin");
+		System.out.println("Interrupting for checkpoint.");
 		
 		checkpoint.saveCheckpoint();
 		
