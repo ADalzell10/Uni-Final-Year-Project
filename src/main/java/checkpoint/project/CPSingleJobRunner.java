@@ -22,15 +22,18 @@
  */
 package checkpoint.project;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
 import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
+import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 
 public class CPSingleJobRunner implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
@@ -63,15 +66,13 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		}
 	};
 	
-	//CPSingleJobRunner herehere = new CPSingleJobRunner();
-	
-	public static void main (String[] args) {
+	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		String choice = "";
-		SetupIaas ss = new SetupIaas();
 		
 		System.out.println("Do you wish to submit a job?");
-		choice = S.nextLine();
-		ss.setupJob(choice);
+		//choice = S.nextLine();
+		//ss.setupJob(choice);
+		SetupIaas.jobDetails();
 		
 		
 	}
@@ -85,15 +86,21 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		for (int i = 0; i < keeperSet.length; i++) {
 			vmSet[i] = keeperSet[i].acquire();
 			if (VirtualMachine.State.RUNNING.equals(vmSet[i].getState())) {
+				
 				readyVMCounter++;
 			} else {
 				vmSet[i].subscribeStateChange(this);
+
 			}
 		}
+		
 		// Increasing ignorecounter in order to sign that the job in this runner
 		// is not yet finished (so the premature termination of the simulation
 		// will show the job ignored)
 		//parent.ignorecounter++;
+		
+		System.out.println("work");
+		
 		startProcess();
 	}
 	
@@ -138,9 +145,15 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	}
 
 	private void startProcess() {
+		
+		System.out.println("started");
+		
 		if (readyVMCounter == vmSet.length) {
 			// Mark that we start the job / no further queuing
+			System.out.println("started");
 			toProcess.started();
+			
+			
 			timeout.cancel();
 			try {
 				// vmset could get null if the compute task is rapidly terminating!
@@ -157,6 +170,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				System.exit(1);
 			}
 		}
+		
 	}
 
 	/**

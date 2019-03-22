@@ -24,105 +24,88 @@ package checkpoint.project;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
+import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.DCFJob;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ConstantConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
-import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.State;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
-import hu.mta.sztaki.lpds.cloud.simulator.io.StorageObject;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
 public class SetupIaas {
 	
-	private CPSingleJobRunner SJR;
-	private ExercisesBaseProj base;
 	private static VMKeeper[] keeper;
 	private static Job job;
-	
-public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
-	
-	
+		
+	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 	
 	
 	//getting arguments to request a VM
-	VirtualAppliance machine = new VirtualAppliance("AD1", 1.5, 10);
-	ResourceConstraints capacity = gettingIaas.getCapacities();
+	VirtualAppliance appliance = new VirtualAppliance("AD1", 1.5, 10);
+	
+	ConstantConstraints constraint = new ConstantConstraints(5, 50000, 100000);
+	ResourceConstraints capacity = constraint;
+	
 	
 	//setting up repository
 	Map<String, Integer> latency = new HashMap<String, Integer>(16);
 	
 	final EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> state = PowerTransitionGenerator.generateTransitions(20, 296, 493, 50, 108);
 	
-	final Map<String, PowerState> diskPower = state.get(PowerTransitionGenerator.PowerStateKind.storage);
-	final Map<String, PowerState> networkPower = state.get(PowerTransitionGenerator.PowerStateKind.network);
+	final Map<String, PowerState> diskPower = state.get(PowerTransitionGenerator.PowerStateKind.storage);		//disk power
+	final Map<String, PowerState> networkPower = state.get(PowerTransitionGenerator.PowerStateKind.network);	//network power
 	
 	Repository repo = new Repository(1000000, "AD2", 2000, 2000, 3500, latency, diskPower, networkPower);
 	
 	//vm request
-	VirtualMachine[] requesting = gettingIaas.requestVM(machine, capacity, repo, 1);
-	
-	//System.out.println(requesting);
+	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, repo, 3);
 	
 	//setting up vmkeeper
-	VirtualMachine thisMachine = (VirtualMachine) Array.get(requesting, 0);
-	
+	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
 	IaaSService selectIaas = gettingIaas; 	//iaas
-	VirtualMachine request = thisMachine; 	//choosing vm
-	long bill = 2;							//bill
+	VirtualMachine request = vm; 			//choosing vm
+	long bill = 10000;						//bill in milliseconds
 	
-	//getKeeper(selectIaas, request, bill);
 	
-	//VMKeeper[] aaronKeeper = getKeeper(selectIaas, request, bill);
-	VMKeeper ke = new VMKeeper(selectIaas, request, bill);
+	//instantiating job
+	DCFJob thisJob = new DCFJob("1001", 100, 5, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
+	Job newJob = thisJob;
 	
-	//VMKeeper[] thisKeeper = ke;
 	
-	Job thisJob = new Job("1001", 10, 5, 20, 4, 5, 10, "Aaron","client", "exec", null, 4);
-	
-	Job thisJob = null;
-	
+	VMKeeper[] newKeeper = Keeper(selectIaas,  request,  bill);		//vmkeeper
 
-	CPSingleJobRunner s = new CPSingleJobRunner(getJob(thisJob), getKeeper(selectIaas, request, bill));
+	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
+
+	}
+	
+	public SetupIaas() {
+		
 	}
 
-	
-	
-	public SetupIaas()  {
-		
-		
+	//places vm details into an array to be used by CPSingleJobRunner
+	public static VMKeeper[] Keeper(IaaSService selectIaas, VirtualMachine request, long bill) {
+		int count = 5;
+		VMKeeper[] vms = new VMKeeper[count];
+		for (int i = 0; i < count ; i++) {
+			vms[i] = new VMKeeper(selectIaas, request, bill);
+		}
+		return vms; 	
 	}
 	
-	public static Job getJob(Job job) {
-		return job;
-	}
-	
-	public static VMKeeper[] getKeeper(IaaSService selectIaas, VirtualMachine request, long bill) {
-		return keeper; 
-		
-	}
-	
-	
-//	private void getKeeper (IaaSService selectIaas, VirtualMachine request, long bill) {
-//		return;
-//	}
 	
 	public void setupJob (String choice) {
 		if (choice.equals("yes")) {
@@ -134,6 +117,4 @@ public static void main (String[] args) throws IllegalArgumentException, Securit
 			ss.beginJob();
 		}
 	}
-	
-
 }
