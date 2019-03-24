@@ -45,8 +45,8 @@ import checkpoint.project.ExercisesBaseProj;
 
 public class SetupIaas {
 	
-	private static VMKeeper[] keeper;
-	private static Job job;
+//	private static VMKeeper[] keeper;
+//	private static Job job;
 		
 	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
@@ -107,14 +107,4 @@ public class SetupIaas {
 	}
 	
 	
-	public void setupJob (String choice) {
-		if (choice.equals("yes")) {
-			System.out.println("Job submitted");
-			
-			//new CPSingleJobRunner(job, keeper);
-			
-			CPSingleJobRunner ss = new CPSingleJobRunner();
-			ss.beginJob();
-		}
-	}
 }

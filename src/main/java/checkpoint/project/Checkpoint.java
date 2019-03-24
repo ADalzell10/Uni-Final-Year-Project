@@ -23,45 +23,30 @@
 package checkpoint.project;
 
 
+import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
+
+
 public class Checkpoint {
 
-	static CPSingleJobRunner s = new CPSingleJobRunner();
-
-	public static void main (String[] args) {
-
+	private static Job job;
+	
+	public Checkpoint(Job CP) {
+		this.job = CP;
+		System.out.println("Checkpoint saved.");
+		return;
 		
-		
-		//s.takeCheckpoint();
-		//checkpoint begins saving
-		s.loadCheckpoint();
 	}
 
-	public static void saveCheckpoint() {
-
-		System.out.println("Saving Checkpoint.");
-		System.out.println("\nCheckpoint Saved."); 
-
-
-
-
-		jobReturn(); //call back to job runner to resume job
-
-	}
-
-	private static void jobReturn() {
-
-		System.out.println("\nResuming job execution.");
-
-		// call to job runner class
-
-
-	}
-
-	public static void loadCheckpoint() {
+	public static Job loadCheckpoint() {
 		//loads most recent checkpoint
 		System.out.println("\nLoading checkpoint.");
-		System.out.println("\nCheckpoint loaded.");
+		
+		System.out.println(job);
+		return job;
+		
+		//System.out.println("\nCheckpoint loaded.");
 
 		//call to where checkpoints are saved for reload of job progress
 	}
+	
 }

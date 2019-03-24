@@ -23,12 +23,9 @@
 package checkpoint.project;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Scanner;
-
 import hu.mta.sztaki.lpds.cloud.simulator.DeferredEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption;
@@ -39,17 +36,12 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
-	private final static Scanner S = new Scanner(System.in);
 
 	static {
 		String to = System.getProperty("hu.mta.sztaki.lpds.cloud.simulator.examples.startupTimeout");
 		startupTimeout = to == null ? defaultStartupTimeout : Long.parseLong(to);
 		//System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
-	
-	Checkpoint checkpoint;
-	
-	private SetupIaas setup;
 	
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
@@ -67,13 +59,9 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	};
 	
 	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
-		String choice = "";
 		
-		System.out.println("Do you wish to submit a job?");
-		//choice = S.nextLine();
-		//ss.setupJob(choice);
+		// gets vmkeeper and job from setup class
 		SetupIaas.jobDetails();
-		
 		
 	}
 	
@@ -100,17 +88,15 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		//parent.ignorecounter++;
 		
 		System.out.println("work");
+		System.out.println(toProcess);
+		takeCheckpoint();
 		
-		startProcess();
+		//startProcess();
 	}
-	
-	
 	
 	public CPSingleJobRunner() {
 		
 	}
-
-
 
 	@Override
 	public void stateChanged(final VirtualMachine vm, final VirtualMachine.State oldState,
@@ -150,9 +136,22 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		
 		if (readyVMCounter == vmSet.length) {
 			// Mark that we start the job / no further queuing
-			System.out.println("started");
+			
 			toProcess.started();
 			
+			//checkpoint
+			
+//			for (int i = 0; i < vmSet.length; i++) {
+//				
+//				//if job not complete, suspend vm
+//				vmSet[i].suspend();
+//				
+//				//takeCheckpoint();
+//				
+//				//resume after checkpoint
+//				vmSet[i].resume();
+//			
+//			}
 			
 			timeout.cancel();
 			try {
@@ -210,24 +209,18 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	
 	
-//	added by my to test class calls
-	
-	public void beginJob() {
-		System.out.println("Job Executing.");
-		
-		takeCheckpoint();
-		
-		}
+	// saving and loading of checkpoint
 	
 	public void takeCheckpoint() {
 		System.out.println("Interrupting for checkpoint.");
 		
-		checkpoint.saveCheckpoint();
+		new Checkpoint(toProcess);
+		return;
 		
 		}
 	
 	public void loadCheckpoint() {
-		checkpoint.loadCheckpoint();
+		Checkpoint.loadCheckpoint();
 	}
 	
 	
