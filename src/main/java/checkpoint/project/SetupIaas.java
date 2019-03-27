@@ -86,7 +86,7 @@ public class SetupIaas {
 	Job newJob = thisJob;
 	
 	
-	VMKeeper[] newKeeper = Keeper(selectIaas,  request,  bill);		//vmkeeper
+	VMKeeper[] newKeeper = keeperSetup(selectIaas,  request,  bill);		//vmkeeper
 
 	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
 
@@ -97,7 +97,7 @@ public class SetupIaas {
 	}
 
 	//places vm details into an array to be used by CPSingleJobRunner
-	public static VMKeeper[] Keeper(IaaSService selectIaas, VirtualMachine request, long bill) {
+	public static VMKeeper[] keeperSetup(IaaSService selectIaas, VirtualMachine request, long bill) {
 		int count = 5;
 		VMKeeper[] vms = new VMKeeper[count];
 		for (int i = 0; i < count ; i++) {
