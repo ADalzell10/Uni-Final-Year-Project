@@ -71,22 +71,26 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		keeperSet = onUs;
 		
 		vmSet = new VirtualMachine[keeperSet.length];
+		
 		// Ensuring we receive state dependent events about the new VMs
 		for (int i = 0; i < keeperSet.length; i++) {
 			vmSet[i] = keeperSet[i].acquire();
+			
 			if (VirtualMachine.State.RUNNING.equals(vmSet[i].getState())) {
 				
 				readyVMCounter++;
 			} else {
+				
 				vmSet[i].subscribeStateChange(this);
-
+				//changes to running state so job can start processing
+				stateChanged(vmSet[i], VirtualMachine.State.DESTROYED, VirtualMachine.State.RUNNING);
+				
 			}
 		}
 		
-		// Increasing ignorecounter in order to sign that the job in this runner
-		// is not yet finished (so the premature termination of the simulation
-		// will show the job ignored)
-		//parent.ignorecounter++;
+		
+		//stateChanged(keeperSet, null, null);
+		
 		
 		System.out.println("work");
 		//System.out.println(toProcess);
@@ -109,7 +113,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 			// Ensures that jobs intended for parallel execution are really run
 			// in parallel
 			++readyVMCounter;
-			startProcess();
+			//startProcess();
 		}
 	}
 
@@ -119,8 +123,9 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		
 		if (readyVMCounter == vmSet.length) {
 			// Mark that we start the job / no further queuing
-			
+			System.out.println("job sus");
 			toProcess.started();
+			
 			timeout.cancel();
 			try {
 				// vmset could get null if the compute task is rapidly terminating!
@@ -133,7 +138,10 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 							ResourceConsumption.unlimitedProcessing, this);
 					
 					//stores the consumption globally;
-					resCon = this.rc;
+					this.rc = resCon;
+					
+					
+					
 				} 
 			} catch (Exception e) {
 				System.err.println(
@@ -142,15 +150,30 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				System.exit(1);
 			}
 		} 
+		
+		//if job not finished, do a checkpoint?
+//		if (toProcess.getExectimeSecs() != 0) {
+//			System.out.println("check");
+//		}
+//		
+//		//checks what point the job is along its execution, takes checkpoint
+//		//after certain amount of time has passed
+//		if (toProcess.getExectimeSecs() == 5) {
+//			System.out.println("first checkpoint");
+//		}
+//		if (toProcess.getExectimeSecs() == 10) {
+//			System.out.println("second checkpoint");
+//		}
+		
 		//suspend the job
-		rc.suspend();
+//		rc.suspend();
 		System.out.println("job suspended");
 		
 		//saves checkpoint of job
-		takeCheckpoint();
+		//takeCheckpoint();
 		
 		//job resumed
-		rc.registerConsumption();
+		//rc.registerConsumption();
 		
 	}
 	
