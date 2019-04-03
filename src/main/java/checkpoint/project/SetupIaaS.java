@@ -28,6 +28,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import hu.mta.sztaki.lpds.cloud.simulator.Timed;
 import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.DCFJob;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
@@ -43,13 +44,14 @@ import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
-public class SetupIaas {
+public class SetupIaaS {
 	
 //	private static VMKeeper[] keeper;
 //	private static Job job;
 		
 	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
+	//Timed.simulateUntil(1000000);
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 	
@@ -78,7 +80,7 @@ public class SetupIaas {
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
 	IaaSService selectIaas = gettingIaas; 	//iaas
 	VirtualMachine request = vm; 			//choosing vm
-	long bill = 10000;						//bill in milliseconds
+	long bill = 60000;						//bill in milliseconds
 	
 	
 	//instantiating job
@@ -89,16 +91,19 @@ public class SetupIaas {
 	VMKeeper[] newKeeper = keeperSetup(selectIaas,  request,  bill);		//vmkeeper
 
 	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
+	
+	Timed.simulateUntil(10000);
+	
 
 	}
 	
-	public SetupIaas() {
+	public SetupIaaS() {
 		
 	}
 
 	//places vm details into an array to be used by CPSingleJobRunner
 	public static VMKeeper[] keeperSetup(IaaSService selectIaas, VirtualMachine request, long bill) {
-		int count = 5;
+		int count = 3;
 		VMKeeper[] vms = new VMKeeper[count];
 		for (int i = 0; i < count ; i++) {
 			vms[i] = new VMKeeper(selectIaas, request, bill);
