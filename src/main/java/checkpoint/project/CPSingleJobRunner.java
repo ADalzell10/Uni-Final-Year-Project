@@ -65,7 +65,8 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		//Timed.simulateUntil(100000);
 		
 		// gets vmkeeper and job from setup class
-		SetupIaaS.jobDetails();
+		//SetupIaaS.jobDetails();
+		TestScenario1.jobDetails();
 		
 	}
 	

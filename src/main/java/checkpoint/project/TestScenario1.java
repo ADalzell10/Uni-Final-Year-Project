@@ -44,10 +44,12 @@ import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
-public class SetupIaaS {
+public class TestScenario1 {
 	
-//	private static VMKeeper[] keeper;
-//	private static Job job;
+	/*
+	 * this test scenario works with multiple jobs being submitted
+	 * 
+	 */
 		
 	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
@@ -58,6 +60,7 @@ public class SetupIaaS {
 	
 	//getting arguments to request a VM
 	VirtualAppliance appliance = new VirtualAppliance("AD1", 1.5, 10);
+	VirtualAppliance appliance2 = new VirtualAppliance("AD2", 3, 10);
 	
 	ConstantConstraints constraint = new ConstantConstraints(5, 50000, 100000);
 	ResourceConstraints capacity = constraint;
@@ -78,31 +81,42 @@ public class SetupIaaS {
 	Repository vmRepo = gettingIaas.repositories.get(0);
 	//vm request
 	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, vmRepo, 3);
+	VirtualMachine[] requesting2 = gettingIaas.requestVM(appliance2, capacity, vmRepo, 3);
 	
-	
+	//System.out.println(gettingIaas.repositories.get(0));
 	
 	//setting up vmkeeper
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
+	VirtualMachine vm2 = (VirtualMachine) Array.get(requesting, 0);
+	
 	IaaSService selectIaas = gettingIaas; 	//iaas
-	VirtualMachine request = vm; 			//choosing vm
+	VirtualMachine request = vm; 	
+	VirtualMachine request1 = vm2;
 	long bill = 60000;						//bill in milliseconds
 	
 	
 	//instantiating job
-	DCFJob thisJob = new DCFJob("1001", 100, 5, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
-	Job newJob = thisJob;
+	DCFJob job1 = new DCFJob("1001", 100, 1, 200, 10, 55, 1000, "Aaron","client", "exec", null, 4);
+	DCFJob job2 = new DCFJob("1002", 200, 2, 300, 17, 40, 1000, "Aaron","client", "exec", null, 4);
+	DCFJob job3 = new DCFJob("1003", 300, 3, 100, 14, 70, 1000, "Aaron","client", "exec", null, 4);
 	
+	Job newJob1 = job1;
+	Job newJob2 = job2;
+	//Job newJob3 = job3;
 	
 	VMKeeper[] newKeeper = keeperSetup(selectIaas,  request,  bill);		//vmkeeper
-
-	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
+	VMKeeper[] newKeeper2 = keeperSetup(selectIaas,  request1,  bill);
+	
+	new CPSingleJobRunner(newJob1, newKeeper);	
+	new CPSingleJobRunner(newJob2, newKeeper2);
+	//new CPSingleJobRunner(newJob3, newKeeper);						//call to begin executing job
 	
 	Timed.simulateUntil(10000);
 	
 
 	}
 	
-	public SetupIaaS() {
+	public TestScenario1() {
 		
 	}
 

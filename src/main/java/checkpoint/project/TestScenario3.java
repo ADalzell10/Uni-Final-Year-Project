@@ -44,7 +44,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
-public class SetupIaaS {
+public class TestScenario3 {
 	
 //	private static VMKeeper[] keeper;
 //	private static Job job;
@@ -79,7 +79,7 @@ public class SetupIaaS {
 	//vm request
 	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, vmRepo, 3);
 	
-	
+	System.out.println(gettingIaas.repositories.get(0));
 	
 	//setting up vmkeeper
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
@@ -102,7 +102,7 @@ public class SetupIaaS {
 
 	}
 	
-	public SetupIaaS() {
+	public TestScenario3() {
 		
 	}
 
