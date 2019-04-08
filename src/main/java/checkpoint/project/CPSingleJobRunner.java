@@ -84,7 +84,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		for (int i = 0; i < keeperSet.length; i++) {
 			vmSet[i] = keeperSet[i].acquire();
 			
-			System.out.println(vmSet[i].getState());
+			
 			
 			if (VirtualMachine.State.RUNNING.equals(vmSet[i].getState())) {
 				
@@ -93,7 +93,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				
 				vmSet[i].subscribeStateChange(this);
 				//stateChanged(vmSet[i], vmSet[i].getState(), VirtualMachine.State.RUNNING);
-				
+				System.out.println(vmSet[i].getState());
 			}
 		}
 		
@@ -105,7 +105,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		//System.out.println(toProcess);
 		//takeCheckpoint();
 		
-		//Timed.simulateUntil(1000000);
+		Timed.simulateUntil(1000000);
 		
 		
 		startProcess();
@@ -155,8 +155,6 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 					System.out.println("test");
 					//stores the consumption globally;
 					this.rc = resCon;
-					
-					
 					
 					
 					

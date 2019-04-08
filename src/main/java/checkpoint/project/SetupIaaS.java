@@ -34,6 +34,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.DCFJob;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ConstantConstraints;
@@ -53,14 +54,14 @@ public class SetupIaaS {
 	
 	//Timed.simulateUntil(1000000);
 	//getting infrastructure
-	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(3);
-		
+	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 	
 	//getting arguments to request a VM
-	VirtualAppliance appliance = new VirtualAppliance("AD1", 1.5, 10);
+	VirtualAppliance appliance = new VirtualAppliance("AD1", 0, 10);
 	
 	
-	ConstantConstraints constraint = new ConstantConstraints(14, 5000000, appliance.size*3);
+	ConstantConstraints constraint = new ConstantConstraints(14, 5000000, 10000000);
+
 	ResourceConstraints capacity = constraint;
 	
 	
@@ -77,6 +78,9 @@ public class SetupIaaS {
 	gettingIaas.registerRepository(repo);
 	
 	Repository vmRepo = gettingIaas.repositories.get(0);
+	gettingIaas.registerRepository(vmRepo);
+	
+	vmRepo.registerObject(appliance);
 	//vm request
 	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, vmRepo, 3);
 	
@@ -86,6 +90,8 @@ public class SetupIaaS {
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
 	IaaSService selectIaas = gettingIaas; 	//iaas
 	VirtualMachine request = vm; 			//choosing vm
+	
+	
 	long bill = 60000;						//bill in milliseconds
 	
 	
