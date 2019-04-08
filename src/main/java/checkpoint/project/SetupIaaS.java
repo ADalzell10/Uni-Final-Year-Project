@@ -53,13 +53,14 @@ public class SetupIaaS {
 	
 	//Timed.simulateUntil(1000000);
 	//getting infrastructure
-	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
-	
+	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(3);
+		
 	
 	//getting arguments to request a VM
 	VirtualAppliance appliance = new VirtualAppliance("AD1", 1.5, 10);
 	
-	ConstantConstraints constraint = new ConstantConstraints(5, 50000, 100000);
+	
+	ConstantConstraints constraint = new ConstantConstraints(14, 5000000, appliance.size*3);
 	ResourceConstraints capacity = constraint;
 	
 	
@@ -97,7 +98,7 @@ public class SetupIaaS {
 
 	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
 	
-	Timed.simulateUntil(10000);
+	Timed.simulateUntil(1000000);
 	
 
 	}

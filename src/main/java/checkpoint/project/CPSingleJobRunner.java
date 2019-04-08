@@ -62,11 +62,15 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		//Timed.simulateUntil(100000);
+		Timed.simulateUntil(100000);
 		
 		// gets vmkeeper and job from setup class
-		//SetupIaaS.jobDetails();
-		TestScenario1.jobDetails();
+		SetupIaaS.jobDetails();
+		
+		
+		//TestScenario1.jobDetails();
+		//TestScenario2.jobDetails();
+		//TestScenario3.jobDetails();
 		
 	}
 	
@@ -79,6 +83,8 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		// Ensuring we receive state dependent events about the new VMs
 		for (int i = 0; i < keeperSet.length; i++) {
 			vmSet[i] = keeperSet[i].acquire();
+			
+			System.out.println(vmSet[i].getState());
 			
 			if (VirtualMachine.State.RUNNING.equals(vmSet[i].getState())) {
 				
@@ -112,24 +118,24 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	@Override
 	public void stateChanged(final VirtualMachine vm, final VirtualMachine.State oldState,
 			final VirtualMachine.State newState) {
-
+		
 		// Now to the real business of having a VM that is actually capable of
 		// running the job
 		if (newState.equals(VirtualMachine.State.RUNNING)) {
 			// Ensures that jobs intended for parallel execution are really run
 			// in parallel
 			++readyVMCounter;
-			//startProcess();
+			startProcess();
 		}
 	}
 
 	private void startProcess() {
 		
-		System.out.println("started");
+		System.out.println("process started");
 		
 		if (readyVMCounter == vmSet.length) {
 			// Mark that we start the job / no further queuing
-			
+			System.out.println("if statement reached");
 			
 			toProcess.started();
 			

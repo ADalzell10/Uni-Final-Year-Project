@@ -33,7 +33,7 @@ public class Checkpoint {
 	public Checkpoint(Job CP) {
 		this.job = CP;
 		System.out.println("Checkpoint saved.");
-		return;
+		//return;
 		
 	}
 
