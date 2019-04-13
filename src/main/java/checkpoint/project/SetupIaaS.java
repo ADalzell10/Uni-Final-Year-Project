@@ -41,6 +41,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ConstantConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
+import hu.mta.sztaki.lpds.cloud.simulator.io.StorageObject;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
 import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
@@ -56,11 +57,26 @@ public class SetupIaaS {
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 	
+	final long VAsize = 856800000;
+	
 	//getting arguments to request a VM
-	VirtualAppliance appliance = new VirtualAppliance("AD1", 0, 10);
+	VirtualAppliance appliance = new VirtualAppliance("AD1", 0, 10, true, VAsize * 150);
+	
+//	System.out.println(appliance.id);
+//	System.out.println(appliance.size);
 	
 	
-	ConstantConstraints constraint = new ConstantConstraints(14, 5000000, 10000000);
+	
+	 
+	
+	
+	//System.out.println(gettingIaas.machines.get(0).localDisk);
+//	System.out.println(gettingIaas.getCapacities());
+//	System.out.println(gettingIaas.getCapacities().getRequiredCPUs());
+//	System.out.println(gettingIaas.getCapacities().getRequiredCPUs() / 3);
+	
+	
+	ConstantConstraints constraint = new ConstantConstraints(gettingIaas.getCapacities().getRequiredCPUs() / 3, 5000000, 10000000);
 
 	ResourceConstraints capacity = constraint;
 	
@@ -81,6 +97,8 @@ public class SetupIaaS {
 	gettingIaas.registerRepository(vmRepo);
 	
 	vmRepo.registerObject(appliance);
+	
+	
 	//vm request
 	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, vmRepo, 3);
 	
@@ -96,7 +114,7 @@ public class SetupIaaS {
 	
 	
 	//instantiating job
-	DCFJob thisJob = new DCFJob("1001", 100, 5, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
+	DCFJob thisJob = new DCFJob("1001", 100, 0, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
 	Job newJob = thisJob;
 	
 	
