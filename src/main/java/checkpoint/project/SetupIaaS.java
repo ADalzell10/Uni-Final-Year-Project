@@ -47,84 +47,51 @@ import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
 public class SetupIaaS {
-	
-//	private static VMKeeper[] keeper;
-//	private static Job job;
 		
 	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
-	//Timed.simulateUntil(1000000);
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
 	
-	final long VAsize = 856800000;
-	
 	//getting arguments to request a VM
-	VirtualAppliance appliance = new VirtualAppliance("AD1", 0, 10, true, VAsize * 150);
-	
-//	System.out.println(appliance.id);
-//	System.out.println(appliance.size);
-	
-	
-	
-	 
-	
-	
-	//System.out.println(gettingIaas.machines.get(0).localDisk);
-//	System.out.println(gettingIaas.getCapacities());
-//	System.out.println(gettingIaas.getCapacities().getRequiredCPUs());
-//	System.out.println(gettingIaas.getCapacities().getRequiredCPUs() / 3);
-	
-	
-	ConstantConstraints constraint = new ConstantConstraints(gettingIaas.getCapacities().getRequiredCPUs() / 3, 5000000, 10000000);
+	//creating VA
+	final long VAsize = 856800000;
+	VirtualAppliance appliance = new VirtualAppliance("AD1", 0, 10, true, VAsize * 20);
+    
+	//resource constraint for each VM
+	ConstantConstraints constraint = new ConstantConstraints(gettingIaas.getCapacities().getRequiredCPUs() / 3, 
+			gettingIaas.getCapacities().getRequiredProcessingPower() / 3, 10000000);
 
 	ResourceConstraints capacity = constraint;
 	
-	
-	//setting up repository
-	Map<String, Integer> latency = new HashMap<String, Integer>(16);
-	
-	final EnumMap<PowerTransitionGenerator.PowerStateKind, Map<String, PowerState>> state = PowerTransitionGenerator.generateTransitions(20, 296, 493, 50, 108);
-	
-	final Map<String, PowerState> diskPower = state.get(PowerTransitionGenerator.PowerStateKind.storage);		//disk power
-	final Map<String, PowerState> networkPower = state.get(PowerTransitionGenerator.PowerStateKind.network);	//network power
-	
-	Repository repo = new Repository(1000000, "AD2", 2000, 2000, 3500, latency, diskPower, networkPower);
-	
+	//using repository from iaas to store vms
+	Repository repo = gettingIaas.repositories.get(0);
 	gettingIaas.registerRepository(repo);
 	
-	Repository vmRepo = gettingIaas.repositories.get(0);
-	gettingIaas.registerRepository(vmRepo);
-	
-	vmRepo.registerObject(appliance);
+	repo.registerObject(appliance);
 	
 	
 	//vm request
-	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, vmRepo, 3);
+	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, repo, 3);
 	
 	
-	
-	//setting up vmkeeper
+	//details for vmkeeper
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
-	IaaSService selectIaas = gettingIaas; 	//iaas
+	IaaSService iaas = gettingIaas; 		//iaas
 	VirtualMachine request = vm; 			//choosing vm
-	
-	
 	long bill = 60000;						//bill in milliseconds
-	
 	
 	//instantiating job
 	DCFJob thisJob = new DCFJob("1001", 100, 0, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
 	Job newJob = thisJob;
 	
 	
-	VMKeeper[] newKeeper = keeperSetup(selectIaas,  request,  bill);		//vmkeeper
+	VMKeeper[] newKeeper = keeperSetup(iaas,  request,  bill);		//vmkeeper
 
 	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
 	
-	Timed.simulateUntil(1000000);
+	Timed.simulateUntil(10000000);
 	
-
 	}
 	
 	public SetupIaaS() {
@@ -132,14 +99,12 @@ public class SetupIaaS {
 	}
 
 	//places vm details into an array to be used by CPSingleJobRunner
-	public static VMKeeper[] keeperSetup(IaaSService selectIaas, VirtualMachine request, long bill) {
+	public static VMKeeper[] keeperSetup(IaaSService iaas, VirtualMachine request, long bill) {
 		int count = 3;
 		VMKeeper[] vms = new VMKeeper[count];
 		for (int i = 0; i < count ; i++) {
-			vms[i] = new VMKeeper(selectIaas, request, bill);
+			vms[i] = new VMKeeper(iaas, request, bill);
 		}
 		return vms; 	
 	}
-	
-	
 }

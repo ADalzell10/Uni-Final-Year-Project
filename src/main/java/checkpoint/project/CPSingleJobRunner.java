@@ -62,7 +62,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		Timed.simulateUntil(100000);
+		//Timed.simulateUntil(100000);
 		
 		// gets vmkeeper and job from setup class
 		SetupIaaS.jobDetails();
@@ -105,7 +105,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		//System.out.println(toProcess);
 		//takeCheckpoint();
 		
-		Timed.simulateUntil(1000000);
+		//Timed.simulateUntil(1000000);
 		
 		
 		startProcess();
@@ -165,6 +165,27 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				e.printStackTrace();
 				System.exit(1);
 			}
+			
+			System.out.println(toProcess.getExectimeSecs());
+			System.out.println(toProcess.getStoptimeSecs());
+			System.out.println(toProcess.getStoptimeSecs());
+			
+//			if(toProcess.getExectimeSecs() != toProcess.getStoptimeSecs()) {
+//				System.out.println("job suspended");
+//				rc.suspend();
+//				System.out.println("job suspended");
+//			}
+			rc.suspend();
+			System.out.println("job suspended");
+			
+			//saves checkpoint of job
+			takeCheckpoint();
+			
+			//job resumed
+			rc.registerConsumption();
+			System.out.println("resumed");
+			
+			
 		} 
 		
 		//if job not finished, do a checkpoint?
@@ -181,15 +202,7 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 //			System.out.println("second checkpoint");
 //		}
 		
-		//suspend the job
-		//rc.suspend();
-		//System.out.println("job suspended");
 		
-		//saves checkpoint of job
-		//takeCheckpoint();
-		
-		//job resumed
-		//rc.registerConsumption();
 		
 	}
 	
@@ -230,7 +243,6 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	
 	// saving and loading of checkpoint
-	
 	public void takeCheckpoint() {
 		System.out.println("Interrupting for checkpoint.");
 		

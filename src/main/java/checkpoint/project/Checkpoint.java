@@ -31,9 +31,8 @@ public class Checkpoint {
 	private static Job job;
 	
 	public Checkpoint(Job CP) {
-		this.job = CP;
+		job = CP;
 		System.out.println("Checkpoint saved.");
-		//return;
 		
 	}
 
