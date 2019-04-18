@@ -23,6 +23,7 @@
 package checkpoint.project;
 
 
+import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 
 
@@ -36,12 +37,31 @@ public class Checkpoint {
 		
 	}
 
-	public static Job loadCheckpoint() {
+//	public static Job loadCheckpoint() {
+//		//loads most recent checkpoint
+//		System.out.println("\nLoading checkpoint.");
+//		
+//		System.out.println(job);
+//		
+//		return job;
+//		
+//		//System.out.println("\nCheckpoint loaded.");
+//
+//		//call to where checkpoints are saved for reload of job progress
+//	}
+	
+	public static void loadCheckpoint() {
 		//loads most recent checkpoint
 		System.out.println("\nLoading checkpoint.");
 		
 		System.out.println(job);
-		return job;
+		
+		VMKeeper[] newKeeper = TestScenario1.keeperSetup(TestScenario1.iaas,  
+				TestScenario1.request,  TestScenario1.bill);
+		
+		//new CPSingleJobRunnerTestDestroy(job, cc);
+		new CPSingleJobRunner(job, newKeeper);
+		//return job;
 		
 		//System.out.println("\nCheckpoint loaded.");
 
