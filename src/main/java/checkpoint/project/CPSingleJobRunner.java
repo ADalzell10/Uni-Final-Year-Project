@@ -33,7 +33,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 
-public class CPSingleJobRunner implements VirtualMachine.StateChange, ConsumptionEvent {
+public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
@@ -62,52 +62,31 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 	
 	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
-		//Timed.simulateUntil(100000);
-		
 		// gets vmkeeper and job from setup class
 		SetupIaaS.jobDetails();
 		
-		
 		//TestScenario1.jobDetails();
 		//TestScenario2.jobDetails();
-		//TestScenario3.jobDetails();
-		
+		//TestScenario3.jobDetails();		
 	}
 	
 	public CPSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
-		
 		vmSet = new VirtualMachine[keeperSet.length];
 		
 		// Ensuring we receive state dependent events about the new VMs
 		for (int i = 0; i < keeperSet.length; i++) {
 			vmSet[i] = keeperSet[i].acquire();
 			
-			
-			
 			if (VirtualMachine.State.RUNNING.equals(vmSet[i].getState())) {
 				
 				readyVMCounter++;
 			} else {
 				
-				vmSet[i].subscribeStateChange(this);
-				//stateChanged(vmSet[i], vmSet[i].getState(), VirtualMachine.State.RUNNING);
-				System.out.println(vmSet[i].getState());
+				vmSet[i].subscribeStateChange(this);		
 			}
 		}
-		
-		
-		//stateChanged(keeperSet, null, null);
-		
-		
-		System.out.println("running");
-		//System.out.println(toProcess);
-		//takeCheckpoint();
-		
-		//Timed.simulateUntil(1000000);
-		
-		
 		startProcess();
 	}
 	
@@ -129,13 +108,13 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		}
 	}
 
-	private void startProcess() {
+	private void startProcess()  {
 		
-		System.out.println("process started");
+		System.out.println("Attempting to run VM");
 		
 		if (readyVMCounter == vmSet.length) {
 			// Mark that we start the job / no further queuing
-			System.out.println("if statement reached");
+			System.out.println("VMs Running.");
 			
 			toProcess.started();
 			
@@ -144,19 +123,14 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				// vmset could get null if the compute task is rapidly terminating!
 				for (int i = 0; vmSet != null && i < vmSet.length; i++) {
 					
-					
 					// run the job's relevant part in the VM
 					//resource consumption returned necessary for suspending job
-					
 					ResourceConsumption resCon = vmSet[i].newComputeTask(
 							toProcess.getExectimeSecs() * vmSet[i].getResourceAllocation().allocated.getRequiredCPUs(),
 							ResourceConsumption.unlimitedProcessing, this);
 					
-					System.out.println("test");
 					//stores the consumption globally;
 					this.rc = resCon;
-					
-					
 					
 				} 
 			} catch (Exception e) {
@@ -165,49 +139,25 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 				e.printStackTrace();
 				System.exit(1);
 			}
-			
-			System.out.println(toProcess.getExectimeSecs());
-			System.out.println(toProcess.getStoptimeSecs());
-			System.out.println(toProcess.getStoptimeSecs());
-			
-//			if(toProcess.getExectimeSecs() != toProcess.getStoptimeSecs()) {
-//				System.out.println("job suspended");
-//				rc.suspend();
-//				System.out.println("job suspended");
-//			}
-			rc.suspend();
-			System.out.println("job suspended");
-			
-			//saves checkpoint of job
-			takeCheckpoint();
-			
-			//job resumed
-			rc.registerConsumption();
-			System.out.println("resumed");
-			
-			
+						
+			for (int i = 0; vmSet != null && i < vmSet.length; i++) {
+				if (vmSet[i].getState() == VirtualMachine.State.RUNNING) {
+					
+					subscribe(5000);
+					rc.suspend();
+					System.out.println("\nJob Suspended.");
+				
+					takeCheckpoint();
+				
+					rc.registerConsumption();
+					System.out.println("Resuming job execution.");
+				} else {
+					System.out.println("VMs not running");
+				}
+			}
 		} 
-		
-		//if job not finished, do a checkpoint?
-//		if (toProcess.getExectimeSecs() != 0) {
-//			System.out.println("check");
-//		}
-//		
-//		//checks what point the job is along its execution, takes checkpoint
-//		//after certain amount of time has passed
-//		if (toProcess.getExectimeSecs() == 5) {
-//			System.out.println("first checkpoint");
-//		}
-//		if (toProcess.getExectimeSecs() == 10) {
-//			System.out.println("second checkpoint");
-//		}
-		
-		
-		
 	}
 	
-	
-
 	/**
 	 * Event handler for the completion of the job
 	 */
@@ -217,6 +167,9 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		if (++completionCounter == vmSet.length) {
 			// everything went smoothly we mark it in the job
 			toProcess.completed();
+			
+			System.out.println("Job Executed Successfully.");
+			
 			// the VMs are no longer needed
 			releaseVMset();
 			
@@ -241,20 +194,19 @@ public class CPSingleJobRunner implements VirtualMachine.StateChange, Consumptio
 		// In the current setup we are not supposed to have failing jobs
 	}
 	
-	
 	// saving and loading of checkpoint
 	public void takeCheckpoint() {
 		System.out.println("Interrupting for checkpoint.");
 		
-		new Checkpoint(toProcess);
-		
+		new Checkpoint(toProcess);	
 		}
 	
 	public void loadCheckpoint() {
 		Checkpoint.loadCheckpoint();
 	}
-	
-	
-	
-	
+
+	@Override
+	public void tick(long fires) {
+		
+	}
 }

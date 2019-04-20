@@ -59,13 +59,30 @@ public class Checkpoint {
 		VMKeeper[] newKeeper = TestScenario1.keeperSetup(TestScenario1.iaas,  
 				TestScenario1.request,  TestScenario1.bill);
 		
+		
 		//new CPSingleJobRunnerTestDestroy(job, cc);
 		new CPSingleJobRunner(job, newKeeper);
-		//return job;
-		
-		//System.out.println("\nCheckpoint loaded.");
 
-		//call to where checkpoints are saved for reload of job progress
+	}
+	
+	public static void loadCheckpointTest2() {
+		//loads most recent checkpoint
+		System.out.println("\nLoading checkpoint.");
+		
+		System.out.println(job);
+		System.out.println(job.getId());
+		System.out.println(TestScenario2.id);
+		
+		if (job.getId() == TestScenario2.id) {
+			VMKeeper[] newKeeper = TestScenario2.keeperSetup(TestScenario2.iaas,  
+					TestScenario2.request,  TestScenario2.bill);
+			
+			
+			//new CPSingleJobRunnerTestDestroy(job, cc);
+			new CPSingleJobRunner(job, newKeeper);
+		} else {
+		System.out.print("Can't load checkpoint for different job");
+		}
 	}
 	
 }

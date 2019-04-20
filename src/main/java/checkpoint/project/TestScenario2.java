@@ -24,30 +24,33 @@ package checkpoint.project;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
 import hu.mta.sztaki.lpds.cloud.simulator.Timed;
-import hu.mta.sztaki.lpds.cloud.simulator.energy.powermodelling.PowerState;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.DCFJob;
 import hu.mta.sztaki.lpds.cloud.simulator.examples.jobhistoryprocessor.VMKeeper;
 import hu.mta.sztaki.lpds.cloud.simulator.helpers.job.Job;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
-import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VMManager.VMManagementException;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ConstantConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
-import hu.mta.sztaki.lpds.cloud.simulator.io.StorageObject;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
-import hu.mta.sztaki.lpds.cloud.simulator.util.PowerTransitionGenerator;
 import checkpoint.project.ExercisesBaseProj;
 
-public class SetupIaaS {
-		
+public class TestScenario2 {
+	
+	public static VirtualMachine request;
+	public static IaaSService iaas;
+	public static long bill = 6000;
+	
+	//this is the main issue used for testing if a checkpoint
+	//can be loaded for a different job
+	public static String id = "1003";
+	
+	
+	
 	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 	
 	//getting infrastructure
@@ -70,29 +73,33 @@ public class SetupIaaS {
 	
 	repo.registerObject(appliance);
 	
+	
 	//vm request
 	VirtualMachine[] requesting = gettingIaas.requestVM(appliance, capacity, repo, 3);
 	
+	
 	//details for vmkeeper
 	VirtualMachine vm = (VirtualMachine) Array.get(requesting, 0);
-	IaaSService iaas = gettingIaas; 		//iaas
-	VirtualMachine request = vm; 			//choosing vm
-	long bill = 60000;						//bill in milliseconds
+	iaas = gettingIaas; 		//iaas
+	request = vm; 			//choosing vm
+	//long bill = 60000;						//bill in milliseconds
+	
+	
 	
 	//instantiating job
-	DCFJob thisJob = new DCFJob("1001", 100, 0, 200, 10, 5, 1000, "Aaron","client", "exec", null, 4);
+	DCFJob thisJob = new DCFJob(id, 100, 0, 200, 10, 5, 1000, "test","Test2", "Testing", null, 4);
 	Job newJob = thisJob;
 	
 	
 	VMKeeper[] newKeeper = keeperSetup(iaas,  request,  bill);		//vmkeeper
 
-	new CPSingleJobRunner(newJob, newKeeper);						//call to begin executing job
+	new CPSingleJobRunnerTestDestroy(newJob, newKeeper);						//call to begin executing job
 	
 	Timed.simulateUntil(10000000);
 	
 	}
 	
-	public SetupIaaS() {
+	public TestScenario2() {
 		
 	}
 
@@ -105,4 +112,11 @@ public class SetupIaaS {
 		}
 		return vms; 	
 	}
+	
+	
+	
+	
+	
+	
+	
 }
