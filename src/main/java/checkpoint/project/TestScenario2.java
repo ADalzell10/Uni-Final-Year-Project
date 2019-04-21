@@ -51,7 +51,7 @@ public class TestScenario2 {
 	
 	
 	
-	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
+	public static void jobDetails() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException  {
 	
 	//getting infrastructure
 	IaaSService gettingIaas = (IaaSService) ExercisesBaseProj.getComplexInfrastructure(1);
@@ -93,7 +93,7 @@ public class TestScenario2 {
 	
 	VMKeeper[] newKeeper = keeperSetup(iaas,  request,  bill);		//vmkeeper
 
-	new CPSingleJobRunnerTestDestroy(newJob, newKeeper);						//call to begin executing job
+	new CPSJR_TestLoadDifferentCP(newJob, newKeeper);						//call to begin executing job
 	
 	Timed.simulateUntil(10000000);
 	
@@ -113,7 +113,16 @@ public class TestScenario2 {
 		return vms; 	
 	}
 	
+	public static Job jobby() {
+	DCFJob thisJob = new DCFJob(id, 100, 0, 200, 10, 5, 1000, "test","Test2", "Testing", null, 4);
+	Job newJob = thisJob;
+	return newJob;
+	}
 	
+	public static VMKeeper[] Keepy() {
+		VMKeeper[] newKeeper = keeperSetup(iaas,  request,  bill);
+		return newKeeper;
+		}
 	
 	
 	

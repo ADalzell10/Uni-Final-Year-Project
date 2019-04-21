@@ -85,7 +85,7 @@ public class TestScenario1 {
 	
 	VMKeeper[] newKeeper = keeperSetup(iaas,  request,  bill);		//vmkeeper
 
-	new CPSingleJobRunnerTestDestroy(newJob, newKeeper);						//call to begin executing job
+	new CPSingleJobRunnerTestLoadCP(newJob, newKeeper);						//call to begin executing job
 	
 	Timed.simulateUntil(10000000);
 	

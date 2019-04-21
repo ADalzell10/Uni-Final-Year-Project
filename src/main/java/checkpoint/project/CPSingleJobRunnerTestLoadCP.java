@@ -33,7 +33,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 
-public class CPSingleJobRunnerTestDestroy extends Timed implements VirtualMachine.StateChange, ConsumptionEvent {
+public class CPSingleJobRunnerTestLoadCP extends Timed implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
@@ -66,11 +66,10 @@ public class CPSingleJobRunnerTestDestroy extends Timed implements VirtualMachin
 		//SetupIaaS.jobDetails();
 		
 		TestScenario1.jobDetails();
-		//TestScenario2.jobDetails();
-		//TestScenario3.jobDetails();		
+		
 	}
 	
-	public CPSingleJobRunnerTestDestroy(final Job runMe, final VMKeeper[] onUs) {
+	public CPSingleJobRunnerTestLoadCP(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
 		vmSet = new VirtualMachine[keeperSet.length];
@@ -90,7 +89,7 @@ public class CPSingleJobRunnerTestDestroy extends Timed implements VirtualMachin
 		startProcess();
 	}
 	
-	public CPSingleJobRunnerTestDestroy() {
+	public CPSingleJobRunnerTestLoadCP() {
 		
 	}
 
@@ -161,14 +160,10 @@ public class CPSingleJobRunnerTestDestroy extends Timed implements VirtualMachin
 			//cancels consumption
 			rc.cancel();
 			
-			//calls to load checkpoint as consumption is cancelled
-//			if(rc.isResumable() == false) {
-//			loadCheckpoint();
-//			}
-			
+			//calls to load checkpoint as consumption is cancelled			
 			if(rc.isResumable() == false) {
-				loadCheckpoint2();
-				}
+				loadCheckpoint();
+			}
 			
 		
 			
@@ -222,9 +217,6 @@ public class CPSingleJobRunnerTestDestroy extends Timed implements VirtualMachin
 		Checkpoint.loadCheckpoint();
 	}
 	
-	public void loadCheckpoint2() {
-		Checkpoint.loadCheckpointTest2();
-	}
 
 	@Override
 	public void tick(long fires) {

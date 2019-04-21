@@ -33,7 +33,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.resourcemodel.ResourceConsumption.ConsumptionEvent;
 import hu.mta.sztaki.lpds.cloud.simulator.io.NetworkNode.NetworkException;
 
-public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChange, ConsumptionEvent {
+public class CPSJR_TestLoadDifferentCP extends Timed implements VirtualMachine.StateChange, ConsumptionEvent {
 	public static final long defaultStartupTimeout = 24 * 3600000; // a day
 	public static final long startupTimeout;
 	
@@ -44,7 +44,7 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 		//System.err.println("VM startup timeout is set to " + startupTimeout);
 	}
 	private ResourceConsumption rc;
-	//private static Boolean nextJob = false;
+	
 	
 	private Job toProcess;
 	private VMKeeper[] keeperSet;
@@ -64,20 +64,11 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 	public static void main (String[] args) throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, VMManagementException, NetworkException {
 		
 		// gets vmkeeper and job from setup class
-		SetupIaaS.jobDetails();
-		
-		//used in testing the loading of a checkpoint
-		//with a different job id
-		
-//		if (nextJob == false) {
-//			SetupIaaS.jobDetails();
-//		} else {
-//		
-//		TestScenario2.jobDetails();
-//		}				
+		TestScenario2.jobDetails();
+			
 	}
 	
-	public CPSingleJobRunner(final Job runMe, final VMKeeper[] onUs) {
+	public CPSJR_TestLoadDifferentCP(final Job runMe, final VMKeeper[] onUs) {
 		toProcess = runMe;
 		keeperSet = onUs;
 		vmSet = new VirtualMachine[keeperSet.length];
@@ -97,7 +88,7 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 		startProcess();
 	}
 	
-	public CPSingleJobRunner() {
+	public CPSJR_TestLoadDifferentCP() {
 		
 	}
 
@@ -128,7 +119,7 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 			timeout.cancel();
 			try {
 				// vmset could get null if the compute task is rapidly terminating!
-				for (int i = 0; vmSet != null && i < vmSet.length; i++) {
+				for (int i = 2; vmSet != null && i < vmSet.length; i++) {
 					
 					// run the job's relevant part in the VM
 					//resource consumption returned necessary for suspending job
@@ -146,39 +137,21 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 				e.printStackTrace();
 				System.exit(1);
 			}
-						
-			for (int i = 0; vmSet != null && i < vmSet.length; i++) {
-				if (vmSet[i].getState() == VirtualMachine.State.RUNNING) {
-					
-					subscribe(5000);
-					rc.suspend();
-					System.out.println("\nJob Suspended.");
-				
-					takeCheckpoint();
-				
-					rc.registerConsumption();
-					System.out.println("Resuming job execution.");
-				} else {
-					System.out.println("VMs not running");
-				}
-			}
 			
-			//rc.cancel();
 			
-			//calls to load checkpoint IF consumption is cancelled			
+			//cancels consumption
+			rc.cancel();
+			
+			//calls to load checkpoint as consumption is cancelled
+//			if(rc.isResumable() == false) {
+//			loadCheckpoint();
+//			}
+			
 			if(rc.isResumable() == false) {
 				loadCheckpoint();
-			}
+				}
 			
-			
-			//used to test checkpoint loading
-			//with a job of a different id
-			
-//			rc.suspend();
-//			nextJob = true;
-//			if (nextJob) {
-//				nextJobLoad();
-//			}
+		
 			
 		} 
 	}
@@ -230,42 +203,6 @@ public class CPSingleJobRunner extends Timed implements VirtualMachine.StateChan
 		Checkpoint.loadCheckpoint();
 	}
 	
-	
-	//Testing the load checkpoint operation for
-	//a job with differetn ID
-	public void nextJobLoad() {
-		try {
-			TestScenario2.jobDetails();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (VMManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NetworkException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
 
 	@Override
 	public void tick(long fires) {
