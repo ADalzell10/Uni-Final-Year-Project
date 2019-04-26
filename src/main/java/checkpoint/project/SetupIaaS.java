@@ -60,7 +60,7 @@ public class SetupIaaS {
     
 	//resource constraint for each VM
 	ConstantConstraints constraint = new ConstantConstraints(gettingIaas.getCapacities().getRequiredCPUs() / 3, 
-			gettingIaas.getCapacities().getRequiredProcessingPower() / 3, 10000000);
+			gettingIaas.getCapacities().getRequiredProcessingPower() / 3, 1000000000);
 
 	ResourceConstraints capacity = constraint;
 	
